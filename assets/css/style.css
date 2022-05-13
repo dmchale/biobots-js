@@ -1,0 +1,25 @@
+#left { width:30%; float:left; }
+#right { width:70%; float:right; }
+
+#settings, #board { border: 1px solid #000; margin:1rem; padding:1rem; }
+
+#settings-save { margin-top: 1rem; }
+
+#container {
+    position: relative;
+    outline: 2px solid #000;
+    font-size: 0;
+    margin: auto;
+    height: 720px;
+    width: 720px;
+    padding: 0;
+    border: none;
+}
+
+.grid {
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: 1px solid #000;
+    display: inline-block;
+}
