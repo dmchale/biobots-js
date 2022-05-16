@@ -13,14 +13,17 @@ function drawBoard( size = 0 ) {
 	if ( size <= 0 ) {
 		size = document.getElementById( 'board-size' ).value;
 	}
-	for ( let rows = 0; rows < size; rows ++ ) {
+	for ( let rows = size-1; rows >= 0; rows -- ) {
 		for ( let cols = 0; cols < size; cols ++ ) {
 			let newEl = document.createElement('div');
 			newEl.className = 'grid';
+			newEl.id = cols + '_' + rows;
+			newEl.title = cols + ', ' + rows
 			document.getElementById( 'container' ).appendChild( newEl );
 		}
 	}
 	resizeGrids( size );
+	bindClicks();
 }
 
 function resizeGrids( size ) {
@@ -32,9 +35,18 @@ function resizeGrids( size ) {
 	} );
 }
 
+function bindClicks() {
+	document.querySelectorAll('.grid').forEach( element => {
+		element.addEventListener( 'click', () => {
+			// do something
+			element.classList.add( 'wall' );
+		});
+	});
+}
+
 // DOM Ready
 document.addEventListener( "DOMContentLoaded", () => {
 	document.getElementById( 'settings-save' ).addEventListener( 'click', resetBoard );
 
-	drawBoard();
+	resetBoard();
 } );
