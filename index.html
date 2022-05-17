@@ -2,6 +2,8 @@
 <head>
     <title>Bio-bots JS</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <script type="text/javascript" src="assets/js/class_grid.js"></script>
+    <script type="text/javascript" src="assets/js/class_board.js"></script>
     <script type="text/javascript" src="assets/js/biobots.js"></script>
 </head>
 <body>
@@ -16,6 +18,10 @@
             <span>Squares per side:</span><input id="board-size" type="number" value="10" /><br />
             <button id="settings-save">Reset Board</button>
         </div>
+        <div id="submit-box">
+            <button id="run-test">Test the Grid</button>
+        </div>
+        <div id="results"></div>
     </div>
     <div id="right">
         <div id="container"></div>
