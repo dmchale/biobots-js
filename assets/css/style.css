@@ -29,3 +29,5 @@
 }
 
 .wall { background-color: #ccc; }
+.bad { background-color: #f00; }
+.good { background-color: #0f0; }

@@ -10,12 +10,26 @@ class BioBotGrid {
         this.bad = null;
     }
 
+    reset = () => {
+        this.wall = null;
+        this.good = null;
+        this.bad = null;
+    }
+
+    isBlocked = () => {
+        if ( this.isWall() || this.isBad() ) { return true; }
+        return false;
+    }
+
     /**
      * WALLS
      *
      * @returns {null}
      */
     isWall = () => {
+        if ( ! (document.getElementById(this.x + '_' + this.y) ) ) {
+            return true;
+        }
         this.wall = (document.getElementById(this.x + '_' + this.y).classList.contains('wall'));
         return this.wall;
     }
