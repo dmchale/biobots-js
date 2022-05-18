@@ -4,24 +4,26 @@
 class BioBotBoard {
 
     /**
-     * @param pixels
+     *
      */
-    constructor( pixels = 0 ) {
+    constructor() {
         // Initialize some class variables
-        this.initializeVariables( pixels );
+        this.initializeVariables();
 
         // Do things in the DOM
-        this.resizeContainer();
         this.resetBoard();
     }
 
     /**
-     * @param pixels
+     *
      */
-    initializeVariables = ( pixels = 0 ) => {
+    initializeVariables = () => {
         this.state = 'waiting';
-        this.pixels = ( pixels > 0 ) ? pixels : 720;
         this.resetCounts();
+
+        this.img_arrow = "url('assets/img/arrow-80.webp')";
+        this.img_arrow_exit = "url('assets/img/arrow-80-exit.webp')";
+
     }
 
     /**
@@ -37,20 +39,41 @@ class BioBotBoard {
      * Resize DOM container for the grids
      */
     resizeContainer = () => {
+        this.pixels = document.getElementById( 'pixels' ).value;
         document.getElementById( 'container' ).style.width = this.pixels + 'px';
         document.getElementById( 'container' ).style.height = this.pixels + 'px';
+    }
+
+    /**
+     * Enforce min/max values of container field value
+     *
+     * @returns {boolean}
+     */
+    testContainerSize = () => {
+        let el = document.getElementById('pixels');
+        let min = parseInt( el.attributes.getNamedItem('min').value );
+        let max = parseInt ( el.attributes.getNamedItem('max').value );
+
+        if ( parseInt( el.value ) < min || parseInt( el.value ) > max ) {
+            alert( 'Container size must be between ' + min + ' and ' + max + ' pixels.' );
+            return false;
+        }
+
+        return true;
     }
 
     /**
      * Reset page to defaults
      */
     resetBoard = () => {
+        if ( ! this.testContainerSize() ) { return; }
         this.state = 'waiting';
         this.resetResults();
 
         this.setUpGrids();
 
         this.clearBoard();
+        this.resizeContainer();
         this.drawBoard();
     }
 
@@ -107,6 +130,7 @@ class BioBotBoard {
             }
         }
         this.sizeGrids();
+        this.addImages();
         this.bindClicks();
     }
 
@@ -161,11 +185,14 @@ class BioBotBoard {
 
         if ( this.grids[x][y].isWall() ) {
             el.classList.remove( 'wall' );
+            el.style.backgroundImage = ( ! el.style.backgroundImage.includes( 'arrow' ) ) ? '' : "url('assets/img/arrow-80.webp')";
             this.grids[x][y].setWall( false );
             return;
         }
 
         el.classList.add( 'wall' );
+        this.set_dom_element_to( 'wall', x, y );
+
         this.grids[x][y].setWall( true );
 
     }
@@ -186,6 +213,8 @@ class BioBotBoard {
                 }
             }
         }
+
+        this.resetNonWallImages();
     }
 
     /**
@@ -207,61 +236,123 @@ class BioBotBoard {
     }
 
     /**
-     *
+     * Main worker when you say to run the tests
      */
     runTest = () => {
         this.state = 'run';
         this.resetCounts();
-        this.set_wall_count();
-        this.test_all_grids();
-
-        document.getElementById( 'results' ).style.display = 'block';
-        document.getElementById( 'results' ).innerHTML = '<h1 style="margin:0;">Results</h1>';
-        document.getElementById( 'results' ).innerHTML += '<ul>';
-        document.getElementById( 'results' ).innerHTML += '<li>Number of walls: ' + this.wall_count + '</li>';
-        document.getElementById( 'results' ).innerHTML += '<li>Number of Good squares: ' + this.good_count + '</li>';
-        document.getElementById( 'results' ).innerHTML += '<li>Number of Bad squares: ' + this.bad_count + '</li>';
-        document.getElementById( 'results' ).innerHTML += '</ul>';
-
+        this.setWallCount();
+        this.testAllGrids();
+        this.displayResults();
     }
 
     /**
-     * does what it says
+     * Output the results to the display area
      */
-    set_wall_count = () => {
+    displayResults = () => {
+
+        let results = '<h1 style="margin:0;">Results</h1>';
+        results += '<ul>';
+        results += '<li>Number of walls: ' + this.wall_count + '</li>';
+        results += '<li>Number of Good squares: ' + this.good_count + '</li>';
+        results += '<li>Number of Bad squares: ' + this.bad_count + '</li>';
+        results += '</ul>';
+
+        let el = document.getElementById( 'results' );
+        el.style.display = 'block';
+        el.innerHTML = results;
+    }
+
+    /**
+     * Counts number of walls on the board
+     */
+    setWallCount = () => {
         let walls = document.getElementsByClassName('wall' );
         this.wall_count = walls.length;
+    }
+
+    img_wall = () => {
+        let random_number = Math.floor(Math.random() * 3) + 1;
+        return "url('assets/img/wall_" + random_number + ".webp')";
+    }
+
+    img_good = () => {
+        let random_number = Math.floor(Math.random() * 4) + 1;
+        return "url('assets/img/good_" + random_number + ".webp')";
+    }
+
+    img_bad = () => {
+        let random_number = Math.floor(Math.random() * 4) + 1;
+        return "url('assets/img/bad_" + random_number + ".webp')";
+    }
+
+    /**
+     * Handles logic to add good/bad class to grid element, and either set or ADD a background-image to the element
+     *
+     * @param type
+     * @param x
+     * @param y
+     */
+    set_dom_element_to = ( type, x, y ) => {
+        let el = document.getElementById( x + '_' + y );
+        el.classList.add(type);
+
+        // Figure out which background image we need
+        let img = '';
+        if ( 'good' === type ) {
+            img = this.img_good();
+        } else if ( 'bad' === type ) {
+            img = this.img_bad();
+        } else if ( 'wall' === type ) {
+            img = this.img_wall();
+        }
+
+        // Add or append background image to grid element
+        if ( el.style.backgroundImage ) {
+            el.style.backgroundImage += ", " + img;
+        } else {
+            el.style.backgroundImage = img;
+        }
+
     }
 
     /**
      * Loop through all the grids and find out what's good & what's not
      */
-    test_all_grids = () => {
-        // TODO: loop through all the grids and find out what's good & what's not
+    testAllGrids = () => {
 
         for ( let y = this.size-1; y >= 0; y -- ) {
             for ( let x = this.size-1; x >= 0; x -- ) {
-                // Make sure the Exit square is always marked good
+
+                // Make sure the Exit square is always marked Good
                 if ( parseInt( x ) === parseInt( this.size-1 ) && parseInt( y ) === parseInt( this.size-1 ) ) {
-                    document.getElementById( x + '_' + y ).classList.add('good');
+                    this.set_dom_element_to( 'good', x, y );
                     this.good_count++;
                     continue;
                 }
 
                 // Test the grid
-                if ( 'bad' === this.test_grid(x, y) ) {
-                    document.getElementById( x + '_' + y ).classList.add('bad');
+                if ( 'bad' === this.testGrid(x, y) ) {
+                    this.set_dom_element_to( 'bad', x, y );
                     this.bad_count++;
-                } else if ( 'good' === this.test_grid(x, y) ) {
-                    document.getElementById( x + '_' + y ).classList.add('good');
+                } else if ( 'good' === this.testGrid(x, y) ) {
+                    this.set_dom_element_to( 'good', x, y );
                     this.good_count++;
                 }
+
             }
         }
 
     }
 
-    test_grid = (x, y) => {
+    /**
+     * Runs a test against a single x,y coordinate
+     *
+     * @param x
+     * @param y
+     * @returns {string}
+     */
+    testGrid = (x, y) => {
         if ( this.grids[x][y].isWall() ) {
             return 'wall';
         }
@@ -273,6 +364,31 @@ class BioBotBoard {
 
         this.grids[x][y].setGood(true);
         return 'good';
+    }
+
+    /**
+     * Handles adding images to the grid along the diagonal line to the Exit
+     */
+    addImages = () => {
+        for ( let i = 0; i < this.size; i++ ) {
+            let el = document.getElementById( i + '_' + i );
+            el.style.backgroundImage = ( i === this.size - 1 ) ? this.img_arrow_exit : this.img_arrow;
+            el.style.backgroundPosition = 'center';
+            el.style.backgroundSize = '100%';
+        }
+
+    }
+
+    resetNonWallImages = () => {
+        for ( let x = 0; x < this.size; x++ ) {
+            for ( let y = 0; y < this.size; y++ ) {
+                let el = document.getElementById( x + '_' + y );
+                if ( ! el.style.backgroundImage.includes('wall') ) {
+                    el.style.backgroundImage = '';
+                }
+            }
+        }
+        this.addImages();
     }
 
 }

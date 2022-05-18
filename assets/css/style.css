@@ -1,11 +1,9 @@
 #left { width:30%; float:left; }
 #right { width:70%; float:right; }
-
 #settings, #submit-box, #results, #board { border: 1px solid #000; margin:1rem; padding:1rem; }
 #results { display:none; }
-
 #settings-save { margin-top: 1rem; }
-
+#settings span { padding-right: 15px; }
 #container {
     position: relative;
     outline: 2px solid #000;
@@ -14,20 +12,13 @@
     padding: 0;
     border: none;
 }
-
 .grid {
     margin: 0;
     padding: 0;
     border: none;
     outline: 1px solid #000;
     display: inline-block;
+    background-position: center;
+    background-size: 100%;
 }
-
-.grid:hover {
-    cursor: pointer;
-    background-color: #fff1a6;
-}
-
-.wall { background-color: #ccc; }
-.bad { background-color: #f00; }
-.good { background-color: #0f0; }
+.grid:hover { cursor: pointer; background-color: #fff1a6; }
