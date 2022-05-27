@@ -3,27 +3,18 @@
  */
 class BioBotBoard {
 
+    state = 'waiting';
+    img_arrow = "url('assets/img/arrow-80.webp')";
+    img_arrow_exit = "url('assets/img/arrow-80-exit.webp')";
+    wall_count = 0;
+    bad_count = 0;
+    good_count = 0;
+
     /**
      *
      */
     constructor() {
-        // Initialize some class variables
-        this.initializeVariables();
-
-        // Do things in the DOM
         this.resetBoard();
-    }
-
-    /**
-     *
-     */
-    initializeVariables = () => {
-        this.state = 'waiting';
-        this.resetCounts();
-
-        this.img_arrow = "url('assets/img/arrow-80.webp')";
-        this.img_arrow_exit = "url('assets/img/arrow-80-exit.webp')";
-
     }
 
     /**
