@@ -363,9 +363,12 @@ class BioBotBoard {
     addImages = () => {
         for ( let i = 0; i < this.size; i++ ) {
             let el = document.getElementById( i + '_' + i );
-            el.style.backgroundImage = ( i === this.size - 1 ) ? this.img_arrow_exit : this.img_arrow;
-            el.style.backgroundPosition = 'center';
-            el.style.backgroundSize = '100%';
+            // Only reset the image if it does NOT already contain a wall
+            if ( ! el.style.backgroundImage.includes('wall') ) {
+                el.style.backgroundImage = ( i === this.size-1 ) ? this.img_arrow_exit : this.img_arrow;
+                el.style.backgroundPosition = 'center';
+                el.style.backgroundSize = '100%';
+            }
         }
 
     }
